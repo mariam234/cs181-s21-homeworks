@@ -43,15 +43,17 @@ class LogisticRegressor:
 
     def fit(self, x, y, w_init=None):
         # Keep this if case for the autograder
+        N = x.shape[0]
+        D = x.shape[1]
         if w_init is not None:
             self.W = w_init
         else:
-            self.W = np.random.rand(x.shape[1], 1)
+            self.W = np.random.rand(D, 1)
         expected_W_shape = self.W.shape
         for i in range(self.runs):
             grad = 0
-            for j in range(x.shape[1]):
-                grad += (self.predict(x[j]) - y[j]) * x[j]
+            for j in range(N):
+                grad += (self.predict(x[j]) - y[j]) * x[j] / N
             self.W = self.W - np.reshape(self.eta * grad, self.W.shape)
             assert self.W.shape == expected_W_shape
 
