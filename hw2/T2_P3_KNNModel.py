@@ -12,20 +12,23 @@ class KNNModel:
         self.y = None
         self.K = k
 
-    # Just to show how to make 'private' methods
-    def __dummyPrivateMethod(self, input):
-        return None
-
-    # TODO: Implement this method!
     def predict(self, X_pred):
-        # The code in this method should be removed and replaced! We included it
-        # just so that the distribution code is runnable and produces a
-        # (currently meaningless) visualization.
         preds = []
-        for x in X_pred:
-            z = np.cos(x ** 2).sum()
-            preds.append(1 + np.sign(z) * (np.abs(z) > 0.3))
+        for i, xi in enumerate(X_pred):
+            dists = [] # elements will have form (dist, y_val)
+            for j, xj in enumerate(self.X):
+                dists.append((self.__dist(xi, xj), self.y[j]))
+            k_nearest = sorted(dists, key=lambda tup: tup[0])[:self.K]
+            ys = [y_val for dist, y_val in k_nearest]
+            # predict class with highest count in the nearest neighbors
+            pred = np.argmax(np.bincount(ys))
+            preds.append(pred)
         return np.array(preds)
+
+    def __dist(self, xi, xj):
+        diff = (xi - xj).reshape(xi.shape[0], 1)
+        diff[0] /= 3
+        return np.dot(diff.T, diff)
 
     # In KNN, "fitting" can be as simple as storing the data, so this has been written for you
     # If you'd like to add some preprocessing here without changing the inputs, feel free,

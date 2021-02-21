@@ -16,16 +16,10 @@ class LogisticRegression:
         self.lam = lam
         self.iters = DEFAULT_ITERS
 
-    # Just to show how to make 'private' methods
-    def __dummyPrivateMethod(self, input):
-        return None
-
     def __basis(self, X):
         return np.hstack((np.ones((X.shape[0], 1)), X))
 
     def __get_prob(self, x):
-        # print("dot", np.dot(self.W.T, x))
-        # print("softmax", softmax(np.dot(self.W.T, x)))
         return softmax(np.dot(self.W.T, x))
 
     def __one_hot(self, val):
@@ -48,20 +42,26 @@ class LogisticRegression:
         N = X.shape[0]
         D = X.shape[1]
         self.W = np.random.rand(D, self.n_classes)
-        # find optimal weight parameters for each class
-        for j in range(self.n_classes):
-            w = self.W[:,j]
-            expected_w_shape = w.shape
-            # run gradient descent
-            for _ in range(self.iters):
-                grad = 0
-                for i in range(N):
-                    grad += ((self.__get_prob(X[i])[j] - Y[i][j]) * X[i]) / N
-                # add regularization and update w based on gradient
-                grad += self.lam * w
-                w -= self.eta * grad
-                assert w.shape == expected_w_shape
-            self.W[:,j] = w
+        expected_W_shape = self.W.shape
+        self.losses = []
+        # start gradient descent
+        for _ in range(self.iters):
+            loss = 0
+            grads = [0] * self.n_classes
+            for i in range(N):
+                # get grad for each class
+                for j in range(self.n_classes):
+                    prob = self.__get_prob(X[i])[j]
+                    loss += Y[i][j] * np.log(prob)
+                    grads[j] += ((self.__get_prob(X[i])[j] - Y[i][j]) * X[i]) / N
+            # update w_j for each class
+            for j in range(self.n_classes):
+                grads[j] += self.lam * self.W[:,j]
+                self.W[:,j] -= self.eta * grads[j]
+                assert self.W.shape == expected_W_shape
+            # update loss for plotting iters vs loss
+            loss = -loss + .5 * self.lam * np.linalg.norm(self.W)
+            self.losses.append(loss)
 
     def predict(self, X_pred):
         X_pred = self.__basis(X_pred)
@@ -74,7 +74,7 @@ class LogisticRegression:
             preds.append(max_class)
         return np.array(preds)
 
-    # simple loss
+    # simple loss on self.X and self.Y
     def get_loss(self):
         X = self.__basis(self.X)
         loss = 0
@@ -85,24 +85,23 @@ class LogisticRegression:
         loss += .5 * self.lam * np.linalg.norm(self.W)
         return loss
 
-    def print_loss(self, loss=None):
+    def __print_loss(self, loss=None):
         if loss is None:
             loss = self.get_loss()
         print("Loss (eta =", self.eta, "lam=", self.lam, "iters=", self.iters, ") :", loss)
 
     # printing loss and plotting for different iters if show_charts = true
     def visualize_loss(self, output_file, show_charts=False):
-        # if show_charts:
-        #     plt.figure()
-        #     plt.title('Number of Iters vs. Loss')
-        #     plt.xlabel('Number of Iterations')
-        #     plt.ylabel('Negative Log-Likelihood Loss')
-        #     plt.scatter(self.iters_lst, self.losses, linewidths=1, edgecolors='black')
-        #     plt.savefig(title + '.png')
-        #         plt.show()
-        # else:
-        #     self.print_loss()
-        self.print_loss()
+        self.__print_loss()
+        title = "Number of Iters vs. Loss"
+        plt.figure()
+        plt.title('Number of Iters vs. Loss')
+        plt.xlabel('Number of Iterations')
+        plt.ylabel('Negative Log-Likelihood Loss')
+        plt.plot(np.arange(self.iters), self.losses)
+        plt.savefig(title + '.png')
+        if show_charts:
+            plt.show()
 
     # getting loss for different hyper-params
     def test_hyperparams(self):
@@ -112,4 +111,4 @@ class LogisticRegression:
                 self.lam = lam
                 self.eta = eta
                 self.fit(self.X, self.y)
-                self.print_loss()
+                self.__print_loss()
