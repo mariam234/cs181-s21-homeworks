@@ -16,15 +16,11 @@ class GaussianGenerativeModel:
     def __dummyPrivateMethod(self, input):
         return None
 
-    # TODO: Implement this method!
     def fit(self, X, y):
+
         return
 
-    # TODO: Implement this method!
     def predict(self, X_pred):
-        # The code in this method should be removed and replaced! We included it
-        # just so that the distribution code is runnable and produces a
-        # (currently meaningless) visualization.
         preds = []
         for x in X_pred:
             z = np.sin(x ** 2).sum()
