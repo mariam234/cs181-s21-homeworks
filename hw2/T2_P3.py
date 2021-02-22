@@ -15,8 +15,8 @@ from T2_P3_KNNModel import KNNModel
 # adjust these as you try to find the best fit for each classifier.
 
 # Logistic Regression hyperparameters
-eta = 0.1 # Learning rate
-lam = 0.1 # Lambda for regularization
+eta = 0.05 # Learning rate
+lam = 0.001 # Lambda for regularization
 
 # Whether or not you want the plots to be displayed
 show_charts = True
@@ -79,22 +79,23 @@ X = df[['Magnitude', 'Temperature']].values
 y = np.array([star_labels[x] for x in df['Type']])
 
 # Setting up and evaluating a number of different classification models
-# nb1 = GaussianGenerativeModel(is_shared_covariance=False)
-# nb1.fit(X, y)
-# visualize_boundary(nb1, X, y, 'generative_result_separate_covariances')
-# print('Separate Covariance negative log-likelihood: {}\n'
-#       .format(nb1.negative_log_likelihood(X, y)))
+nb1 = GaussianGenerativeModel(is_shared_covariance=False)
+nb1.fit(X, y)
+visualize_boundary(nb1, X, y, 'generative_result_separate_covariances')
+print('Separate Covariance negative log-likelihood: {}\n'
+      .format(nb1.negative_log_likelihood(X, y)))
 
-# nb2 = GaussianGenerativeModel(is_shared_covariance=True)
-# nb2.fit(X, y)
-# visualize_boundary(nb2, X, y, 'generative_result_shared_covariances')
-# print('Shared Covariance negative log-likelihood: {}\n'
-#       .format(nb2.negative_log_likelihood(X, y)))
+nb2 = GaussianGenerativeModel(is_shared_covariance=True)
+nb2.fit(X, y)
+visualize_boundary(nb2, X, y, 'generative_result_shared_covariances')
+print('Shared Covariance negative log-likelihood: {}\n'
+      .format(nb2.negative_log_likelihood(X, y)))
 
-# lr = LogisticRegression(eta=eta, lam=lam)
-# lr.fit(X, y)
-# lr.visualize_loss('logistic_regression_loss', show_charts=show_charts)
-# visualize_boundary(lr, X, y, 'logistic_regression_result')
+lr = LogisticRegression(eta=eta, lam=lam)
+lr.fit(X, y)
+lr.visualize_loss('logistic_regression_loss', show_charts=show_charts)
+visualize_boundary(lr, X, y, 'logistic_regression_result')
+# lr.test_hyperparams()
 
 knn1 = KNNModel(k=1)
 knn1.fit(X, y)

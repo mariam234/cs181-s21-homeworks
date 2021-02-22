@@ -43,7 +43,7 @@ class GaussianGenerativeModel:
             for i in range(len(X_filtered)):
                 d = np.reshape(X_filtered[i] - self.x_means[k], (D, 1))
                 cov_sum += np.dot(d, d.T)
-            # check that cov sum symmetric then set cov
+            # check that cov sum symmetric then set separate cov
             assert np.allclose(cov_sum, cov_sum.T)
             cov_sums.append(cov_sum)
             if not self.is_shared_covariance:

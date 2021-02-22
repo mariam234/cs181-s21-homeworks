@@ -76,13 +76,13 @@ class LogisticRegression:
 
     # simple loss on self.X and self.Y
     def get_loss(self):
+        # return -np.sum(np.add(np.multiply(self.Y, np.log(softmax(self.X @ self.W))), self.lam * (np.linalg.norm(self.W))**2 ))
         X = self.__basis(self.X)
         loss = 0
         for i in range(len(self.Y)):
             for j in range(self.n_classes):
-                loss += self.Y[i][j] * np.log(self.__get_prob(X[i]))
-        loss *= -1
-        loss += .5 * self.lam * np.linalg.norm(self.W)
+                loss += self.Y[i][j] * np.log(self.__get_prob(X[i])[j])
+        loss = -loss + .5 * self.lam * np.linalg.norm(self.W) ** 2
         return loss
 
     def __print_loss(self, loss=None):
@@ -105,6 +105,7 @@ class LogisticRegression:
 
     # getting loss for different hyper-params
     def test_hyperparams(self):
+        self.iters = 2000
         hyperparams = [0.05, 0.01, 0.001]
         for lam in hyperparams:
             for eta in hyperparams:
@@ -112,3 +113,4 @@ class LogisticRegression:
                 self.eta = eta
                 self.fit(self.X, self.y)
                 self.__print_loss()
+        self.iters = DEFAULT_ITERS
